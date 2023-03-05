@@ -27,7 +27,7 @@ async fn get_secret(client: &Client, name: &str) -> GetSecretValueOutput {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let secrets_path = env::var("SFTP_CREDENTIALS_PATH").expect("SFTP_CREDENTIALS_PATH is not set");
+    let secrets_path = env::var("SFTP_SECRETS_PATH").expect("SFTP_SECRETS_PATH is not set");
     let aws_config = aws_config::load_from_env().await;
     let secrets_client = Client::new(&aws_config);
 
