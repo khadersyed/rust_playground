@@ -1,14 +1,18 @@
 use aws_sdk_secretsmanager::{output::GetSecretValueOutput, Client, Error};
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
 use std::env;
 
+#[serde_as]
 #[derive(Serialize, Deserialize, Debug)]
 struct SFTPCred {
     host: String,
-    port: String,
+    #[serde_as(as = "Option<DisplayFromStr>")]
+    port: Option<i16>,
     username: String,
     password: Option<String>,
-    sftp_path: Option<String>,
+    incoming_folder: Option<String>,
+    public_key: Option<String>,
 }
 
 async fn get_secret(client: &Client, name: &str) -> GetSecretValueOutput {
