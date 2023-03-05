@@ -1,9 +1,15 @@
 use aws_sdk_secretsmanager::{output::GetSecretValueOutput, Client, Error};
-use serde_json::Value;
+use serde::{Deserialize, Serialize};
 use std::env;
 
-#[derive(Debug)]
-struct CustomError(String);
+#[derive(Serialize, Deserialize, Debug)]
+struct SFTPCred {
+    host: String,
+    port: String,
+    username: String,
+    password: Option<String>,
+    sftp_path: Option<String>,
+}
 
 async fn get_secret(client: &Client, name: &str) -> GetSecretValueOutput {
     let resp = client
@@ -23,9 +29,8 @@ async fn main() -> Result<(), Error> {
 
     let secret_data = get_secret(&secrets_client, &secrets_path).await;
 
-    let client_id = match secret_data.secret_string() {
-        None => panic!("Issue accessing the secret."),
-        Some(v) => println!("{}", serde_json::from_str::<Value>(v).unwrap()["client_id"]),
-    };
-    Ok(client_id)
+    let sftp_creds: SFTPCred = serde_json::from_str(secret_data.secret_string().unwrap()).unwrap();
+
+    println!("{:?}", sftp_creds);
+    Ok(())
 }
